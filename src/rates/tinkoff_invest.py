@@ -29,7 +29,6 @@ class TinkoffInvest(UsdRubRate):
             if response.status_code != 200:
                 logger.error(f"Received status_code={response.status_code}: {response.text}")
                 return []
-            print(response.text)
             json = response.json()
             json_candles = json['payload']['candles']
             candles = []
