@@ -26,4 +26,7 @@ class Messenger:
         return random.choice(self._neutral)
 
     def _with_price(self, s: str, price: float) -> str:
-        return s.replace('%v', str(price)) if '%v' in s else s
+        if '%v' in s:
+            return s.replace('%v', str(price))
+        else:
+            return s
