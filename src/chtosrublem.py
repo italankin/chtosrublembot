@@ -12,9 +12,9 @@ from rates.usd_rub_rate import Candle, UsdRubRate
 logger = logging.getLogger(__name__)
 
 MAX_STEPS_BACK = 7
-RESULTS_THRESHOLD = 20
+RESULTS_THRESHOLD = 10
 DAYS_DELTA = 3
-VALUE_THRESHOLD = 0.8
+VALUE_THRESHOLD = 0.5
 
 
 class ChtoSRublem:
