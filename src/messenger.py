@@ -14,11 +14,16 @@ class Messenger:
             self._rub_down = j['rub_down']
             self._neutral = j['neutral']
 
-    def usd_down(self) -> str:
-        return random.choice(self._usd_down)
+    def usd_down(self, price: float) -> str:
+        s = random.choice(self._rub_down)
+        return self._with_price(s, price)
 
-    def rub_down(self) -> str:
-        return random.choice(self._rub_down)
+    def rub_down(self, price: float) -> str:
+        s = random.choice(self._rub_down)
+        return self._with_price(s, price)
 
     def neutral(self) -> str:
         return random.choice(self._neutral)
+
+    def _with_price(self, s: str, price: float) -> str:
+        return s.replace('%v', str(price)) if '%v' in s else s

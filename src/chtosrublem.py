@@ -51,11 +51,12 @@ class ChtoSRublem:
         return result
 
     def _get_msg(self, candles: list[Candle]) -> str:
-        diff = candles[-1].c - candles[0].o
+        last = candles[-1].c
+        diff = last - candles[0].o
         if diff > VALUE_THRESHOLD:
-            return self._messenger.rub_down()
+            return self._messenger.rub_down(last)
         if diff < -VALUE_THRESHOLD:
-            return self._messenger.usd_down()
+            return self._messenger.usd_down(last)
         return self._messenger.neutral()
 
     def _make_plot(self, candles: list[Candle]) -> Optional[io.BytesIO]:
