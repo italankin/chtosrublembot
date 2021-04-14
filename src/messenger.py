@@ -15,7 +15,7 @@ class Messenger:
             self._neutral = j['neutral']
 
     def usd_down(self, price: float) -> str:
-        s = random.choice(self._rub_down)
+        s = random.choice(self._usd_down)
         return self._with_price(s, price)
 
     def rub_down(self, price: float) -> str:
