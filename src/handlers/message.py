@@ -11,6 +11,8 @@ def register(dispatcher: Dispatcher):
 
 @incontext
 def _command(bot_context: BotContext, update: Update, context: CallbackContext):
+    if not update.message:
+        return
     text = update.message.text
     if not _is_trigger(bot_context, context, text):
         return
