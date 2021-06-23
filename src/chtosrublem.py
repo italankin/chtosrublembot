@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 MAX_STEPS_BACK = 7
 RESULTS_THRESHOLD = 10
 DAYS_DELTA = 3
-VALUE_THRESHOLD = 0.5
+VALUE_THRESHOLD = 0.05
 
 
 class ChtoSRublem:
