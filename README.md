@@ -8,6 +8,7 @@ Parameter|Description
 ---|---
 `TELEGRAM_BOT_TOKEN`|Telegram bot token
 `BOT_TRIGGERS_FILE`|Triggers and symbols for bot
+`FCSAPI_ACCESS_KEY`|Access key for [FCS API](https://fcsapi.com/)
 
 # Docker
 
@@ -23,8 +24,8 @@ Create file `.env` with the following contents:
 
  ```env
  TELEGRAM_BOT_TOKEN=<your-bot-token>
- BOT_TRIGGER_PATTERN=<regex-pattern-of-message-to-trigger-bot>
  BOT_TRIGGERS_FILE=/data/triggers.json
+ FCSAPI_ACCESS_KEY=<your-access-key>
  ```
 
 ### Triggers file
