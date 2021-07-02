@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class GetRate:
-    def candles(self, symbol: str, date_from: datetime, date_to: datetime) -> list['Candle']:
+    def candles(self, symbol: str) -> list['Candle']:
         pass
 
 

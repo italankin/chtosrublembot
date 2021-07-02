@@ -5,6 +5,7 @@ from typing import Pattern, Tuple
 
 from bot_env import BotEnv
 from chtosrublem import ChtoSRublem
+from rates.fcsapi import FcsApi
 from rates.get_rate import GetRate
 
 
@@ -16,7 +17,7 @@ class BotContext:
 
     def __init__(self):
         self.bot_env = BotEnv()
-        self.get_rate = None  # TODO
+        self.get_rate = FcsApi(self.bot_env.fcs_access_key)
         self.chtosrublem = ChtoSRublem(self.get_rate)
         self.triggers = self._parse_triggers()
 

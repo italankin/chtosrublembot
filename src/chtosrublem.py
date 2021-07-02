@@ -1,6 +1,6 @@
 import io
 import logging
-from datetime import timezone, datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
 from matplotlib.axes import Axes
@@ -9,11 +9,6 @@ from matplotlib.figure import Figure
 from rates.get_rate import GetRate, Candle
 
 logger = logging.getLogger(__name__)
-
-MAX_STEPS_BACK = 7
-RESULTS_THRESHOLD = 10
-DAYS_DELTA = 3
-VALUE_THRESHOLD = 0.05
 
 
 class ChtoSRublem:
@@ -30,21 +25,7 @@ class ChtoSRublem:
         return Status(text='', plot=plot)
 
     def _candles(self, symbol: str) -> list[Candle]:
-        start = datetime.now(timezone.utc)
-        result: list[Candle] = []
-        step = 0
-        while True:
-            step = step + 1
-            end = start - timedelta(days=DAYS_DELTA)
-            candles = self._get_rate.candles(symbol, date_from=end, date_to=start)
-            for c in reversed(candles):
-                result.insert(0, c)
-            if len(result) > RESULTS_THRESHOLD:
-                return result
-            if step >= MAX_STEPS_BACK:
-                break
-            start = start - timedelta(days=DAYS_DELTA)
-        return result
+        return self._get_rate.candles(symbol)
 
     def _make_plot(self, symbol: str, candles: list[Candle]) -> Optional[io.BytesIO]:
         try:
