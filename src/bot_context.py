@@ -1,26 +1,31 @@
+import json
+import re
 from functools import wraps
+from typing import Pattern, Tuple
 
 from bot_env import BotEnv
-from messenger import Messenger
 from chtosrublem import ChtoSRublem
-from rates.tinkoff_invest import TinkoffInvest
-from rates.usd_rub_rate import UsdRubRate
+from rates.get_rate import GetRate
 
 
 class BotContext:
     bot_env: BotEnv
-    usd_rub_rate: UsdRubRate
-    messenger: Messenger
+    get_rate: GetRate
     chtosrublem: ChtoSRublem
+    triggers: list[Tuple[Pattern, str]]
 
     def __init__(self):
         self.bot_env = BotEnv()
-        self.usd_rub_rate = TinkoffInvest(
-            self.bot_env.tinkoff_invest_api_token,
-            self.bot_env.tinkoff_invest_api_base_url
-        )
-        self.messenger = Messenger(self.bot_env.responses_file)
-        self.chtosrublem = ChtoSRublem(self.usd_rub_rate, self.messenger)
+        self.get_rate = None  # TODO
+        self.chtosrublem = ChtoSRublem(self.get_rate)
+        self.triggers = self._parse_triggers()
+
+    def _parse_triggers(self) -> list[Tuple[Pattern, str]]:
+        if not self.bot_env.triggers_file:
+            raise ValueError(f"Triggers file is not set")
+        with open(self.bot_env.triggers_file) as f:
+            root = json.load(f)
+            return [(re.compile(node['trigger'], flags=re.IGNORECASE), node['symbol']) for node in root]
 
     @staticmethod
     def get() -> 'BotContext':

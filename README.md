@@ -12,10 +12,10 @@ Parameter|Description
 `BOT_TRIGGER_PATTERN`|Regex which will trigger bot responses
 `BOT_RESPONSES_FILE`|A path to a responses json file
 
- # Docker
- 
- ## Build image
- 
+# Docker
+
+## Build image
+
  ```sh
  $ docker build -t chtosrublembot .
  ```

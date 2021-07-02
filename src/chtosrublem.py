@@ -6,8 +6,7 @@ from typing import Optional
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from messenger import Messenger
-from rates.usd_rub_rate import Candle, UsdRubRate
+from rates.get_rate import GetRate, Candle
 
 logger = logging.getLogger(__name__)
 
@@ -18,29 +17,26 @@ VALUE_THRESHOLD = 0.05
 
 
 class ChtoSRublem:
-    _usd_rub_rate: UsdRubRate
-    _messenger: Messenger
+    _get_rate: GetRate
 
-    def __init__(self, usd_rub_rate: UsdRubRate, messenger: Messenger):
-        self._usd_rub_rate = usd_rub_rate
-        self._messenger = messenger
+    def __init__(self, get_rate: GetRate):
+        self._get_rate = get_rate
 
-    def status(self) -> 'Status':
-        candles = self._candles()
+    def status(self, symbol: str) -> 'Status':
+        candles = self._candles(symbol)
         if len(candles) == 0:
             raise ValueError('No data available')
-        msg = self._get_msg(candles)
-        plot = self._make_plot(candles)
-        return Status(text=msg, plot=plot)
+        plot = self._make_plot(symbol, candles)
+        return Status(text='', plot=plot)
 
-    def _candles(self) -> list[Candle]:
+    def _candles(self, symbol: str) -> list[Candle]:
         start = datetime.now(timezone.utc)
         result: list[Candle] = []
         step = 0
         while True:
             step = step + 1
             end = start - timedelta(days=DAYS_DELTA)
-            candles = self._usd_rub_rate.candles(date_from=end, date_to=start)
+            candles = self._get_rate.candles(symbol, date_from=end, date_to=start)
             for c in reversed(candles):
                 result.insert(0, c)
             if len(result) > RESULTS_THRESHOLD:
@@ -50,19 +46,7 @@ class ChtoSRublem:
             start = start - timedelta(days=DAYS_DELTA)
         return result
 
-    def _get_msg(self, candles: list[Candle]) -> str:
-        first = candles[0].o
-        last = candles[-1].c
-        diff = last - first
-        logger.debug(f"first={first}, last={last}, diff={diff}")
-        if abs(diff) < VALUE_THRESHOLD:
-            return self._messenger.neutral()
-        if diff > 0:
-            return self._messenger.rub_down(last)
-        else:
-            return self._messenger.usd_down(last)
-
-    def _make_plot(self, candles: list[Candle]) -> Optional[io.BytesIO]:
+    def _make_plot(self, symbol: str, candles: list[Candle]) -> Optional[io.BytesIO]:
         try:
             values = []
             date_start: datetime.date = datetime.max.date()
@@ -81,7 +65,7 @@ class ChtoSRublem:
 
             fig = Figure(figsize=(4, 3))
             ax: Axes = fig.add_subplot(111)
-            ax.set_title(f"USDRUB ({date_text})")
+            ax.set_title(f"{symbol} ({date_text})")
             ax.margins(0)
             ax.yaxis.grid(True, linestyle=':')
             ax.set_xticklabels([])

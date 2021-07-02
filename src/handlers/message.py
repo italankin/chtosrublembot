@@ -1,3 +1,5 @@
+from typing import Optional
+
 from telegram import Update
 from telegram.ext import Dispatcher, MessageHandler, Filters, CallbackContext
 
@@ -10,13 +12,14 @@ def register(dispatcher: Dispatcher):
 
 
 @incontext
-def _command(bot_context: BotContext, update: Update, context: CallbackContext):
+def _command(bot_context: BotContext, update: Update, _):
     if not update.message:
         return
     text = update.message.text
-    if not _is_trigger(bot_context, context, text):
+    symbol = _find_symbol(bot_context, text)
+    if not symbol:
         return
-    status = bot_context.chtosrublem.status()
+    status = bot_context.chtosrublem.status(symbol)
     if status.plot:
         update.effective_message.reply_photo(
             photo=status.plot,
@@ -30,8 +33,8 @@ def _command(bot_context: BotContext, update: Update, context: CallbackContext):
         )
 
 
-def _is_trigger(bot_context: BotContext, context: CallbackContext, text: str) -> bool:
-    s = text.lower()
-    if s == f"@{context.bot.username}":
-        return True
-    return bot_context.bot_env.trigger_pattern.fullmatch(s) is not None
+def _find_symbol(bot_context: BotContext, text: str) -> Optional[str]:
+    for pattern, symbol in bot_context.triggers:
+        if pattern.fullmatch(text):
+            return symbol
+    return None
