@@ -34,14 +34,14 @@ JSON file with triggers:
 
  ```json
  [
- {
-  "symbol": "USD/RUB",
-  "trigger": "USD OK\\?"
- },
- {
-  "symbol": "EUR/RUB",
-  "trigger": "EUR OK\\?"
- }
+  {
+   "symbol": "USD/RUB",
+   "trigger": "USD OK\\?"
+  },
+  {
+   "symbol": "EUR/RUB",
+   "trigger": "EUR OK\\?"
+  }
 ]
  ```
 
