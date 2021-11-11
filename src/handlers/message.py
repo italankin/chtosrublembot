@@ -1,6 +1,6 @@
 from typing import Optional
 
-from telegram import Update
+from telegram import Update, ChatAction
 from telegram.ext import Dispatcher, MessageHandler, Filters, CallbackContext
 
 from bot_context import incontext, BotContext
@@ -19,6 +19,7 @@ def _command(bot_context: BotContext, update: Update, _):
     symbol = _find_symbol(bot_context, text)
     if not symbol:
         return
+    update.message.reply_chat_action(ChatAction.TYPING)
     status = bot_context.chtosrublem.status(symbol)
     if status.plot:
         update.effective_message.reply_photo(
