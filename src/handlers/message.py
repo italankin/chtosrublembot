@@ -35,7 +35,7 @@ def _command(bot_context: BotContext, update: Update, _):
 
 
 def _find_symbol(bot_context: BotContext, text: str) -> Optional[str]:
-    for pattern, symbol in bot_context.triggers:
-        if pattern.fullmatch(text):
-            return symbol
+    for trigger in bot_context.triggers:
+        if trigger.fullmatch.fullmatch(text) or trigger.substring and trigger.substring.search(text):
+            return trigger.symbol
     return None

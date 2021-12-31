@@ -1,8 +1,8 @@
 import json
 import re
 from functools import wraps
-from typing import Pattern, Tuple
 
+from message_trigger import MessageTrigger
 from bot_env import BotEnv
 from chtosrublem import ChtoSRublem
 from rates.fcsapi import FcsApi
@@ -13,7 +13,7 @@ class BotContext:
     bot_env: BotEnv
     get_rate: GetRate
     chtosrublem: ChtoSRublem
-    triggers: list[Tuple[Pattern, str]]
+    triggers: list[MessageTrigger]
 
     def __init__(self):
         self.bot_env = BotEnv()
@@ -21,12 +21,17 @@ class BotContext:
         self.chtosrublem = ChtoSRublem(self.get_rate)
         self.triggers = self._parse_triggers()
 
-    def _parse_triggers(self) -> list[Tuple[Pattern, str]]:
+    def _parse_triggers(self) -> list[MessageTrigger]:
         if not self.bot_env.triggers_file:
             raise ValueError(f"Triggers file is not set")
         with open(self.bot_env.triggers_file) as f:
             root = json.load(f)
-            return [(re.compile(node['trigger'], flags=re.IGNORECASE), node['symbol']) for node in root]
+            return [BotContext._parse_node(node) for node in root]
+
+    @staticmethod
+    def _parse_node(node) -> MessageTrigger:
+        substring = re.compile(node['substring']) if 'substring' in node else None
+        return MessageTrigger(re.compile(node['trigger'], flags=re.IGNORECASE), substring, node['symbol'])
 
     @staticmethod
     def get() -> 'BotContext':
