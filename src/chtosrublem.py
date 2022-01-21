@@ -55,6 +55,7 @@ class ChtoSRublem:
             ax.set_xticklabels([])
             ax.xaxis.set_tick_params(which='both', length=0)
             ax.plot(values)
+            ax.text(x=len(values) - 1, y=values[-1], s=str(values[-1]))
 
             buf = io.BytesIO()
             fig.savefig(buf, dpi=120)
