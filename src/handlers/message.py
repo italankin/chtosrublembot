@@ -1,7 +1,8 @@
+import random
 from typing import Optional
 
 from telegram import Update, ChatAction
-from telegram.ext import Dispatcher, MessageHandler, Filters, CallbackContext
+from telegram.ext import Dispatcher, MessageHandler, Filters
 
 from bot_context import incontext, BotContext
 
@@ -36,6 +37,9 @@ def _command(bot_context: BotContext, update: Update, _):
 
 def _find_symbol(bot_context: BotContext, text: str) -> Optional[str]:
     for trigger in bot_context.triggers:
-        if trigger.fullmatch.fullmatch(text) or trigger.substring and trigger.substring.search(text):
+        if trigger.fullmatch.fullmatch(text):
             return trigger.symbol
+        if trigger.substring and trigger.substring.search(text):
+            if random.random() <= bot_context.bot_env.substring_trigger_rate:
+                return trigger.symbol
     return None

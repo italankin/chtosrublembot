@@ -9,6 +9,7 @@ Parameter|Description
 `TELEGRAM_BOT_TOKEN`|Telegram bot token
 `BOT_TRIGGERS_FILE`|Triggers and symbols for bot
 `FCSAPI_ACCESS_KEY`|Access key for [FCS API](https://fcsapi.com/)
+`BOT_SUBSTRING_TRIGGER_RATE`|A float in range `[0..1]` which limits substring triggering 
 
 # Docker
 
