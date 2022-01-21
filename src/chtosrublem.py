@@ -6,6 +6,7 @@ from typing import Optional
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+from messengers.messenger import Messenger
 from rates.get_rate import GetRate, Candle
 
 logger = logging.getLogger(__name__)
@@ -13,16 +14,18 @@ logger = logging.getLogger(__name__)
 
 class ChtoSRublem:
     _get_rate: GetRate
+    _messenger: Messenger
 
-    def __init__(self, get_rate: GetRate):
+    def __init__(self, get_rate: GetRate, messenger: Messenger):
         self._get_rate = get_rate
+        self._messenger = messenger
 
     def status(self, symbol: str) -> 'Status':
         candles = self._candles(symbol)
         if len(candles) == 0:
             raise ValueError('No data available')
         plot = self._make_plot(symbol, candles)
-        return Status(text='', plot=plot)
+        return Status(text=self._messenger.caption(symbol), plot=plot)
 
     def _candles(self, symbol: str) -> list[Candle]:
         return self._get_rate.candles(symbol)

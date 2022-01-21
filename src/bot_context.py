@@ -5,6 +5,7 @@ from functools import wraps
 from message_trigger import MessageTrigger
 from bot_env import BotEnv
 from chtosrublem import ChtoSRublem
+from messengers.noop import NoOpMessenger
 from rates.fcsapi import FcsApi
 from rates.get_rate import GetRate
 
@@ -18,8 +19,8 @@ class BotContext:
     def __init__(self):
         self.bot_env = BotEnv()
         self.get_rate = FcsApi(self.bot_env.fcs_access_key)
-        self.chtosrublem = ChtoSRublem(self.get_rate)
         self.triggers = self._parse_triggers()
+        self.chtosrublem = ChtoSRublem(self.get_rate, NoOpMessenger())
 
     def _parse_triggers(self) -> list[MessageTrigger]:
         if not self.bot_env.triggers_file:
@@ -31,7 +32,18 @@ class BotContext:
     @staticmethod
     def _parse_node(node) -> MessageTrigger:
         substring = re.compile(node['substring']) if 'substring' in node else None
-        return MessageTrigger(re.compile(node['trigger'], flags=re.IGNORECASE), substring, node['symbol'])
+        captions = node.get('captions', [])
+        fullmatch = re.compile(node['trigger'], flags=re.IGNORECASE)
+        return MessageTrigger(fullmatch, substring, node['symbol'], captions)
+
+    @staticmethod
+    def _get_messenger_data(triggers: list[MessageTrigger]) -> dict[str, list[str]]:
+        messenger_data = {}
+        for trigger in triggers:
+            if len(trigger.captions) == 0:
+                continue
+            messenger_data[trigger.symbol] = trigger.captions
+        return messenger_data
 
     @staticmethod
     def get() -> 'BotContext':
