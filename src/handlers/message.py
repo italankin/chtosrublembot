@@ -8,7 +8,7 @@ from bot_context import incontext, BotContext
 
 
 def register(dispatcher: Dispatcher):
-    filters = Filters.text & (~Filters.command) & (~Filters.forwarded) & (~Filters.caption)
+    filters = Filters.text & (~Filters.command)
     dispatcher.add_handler(MessageHandler(filters, _command, run_async=True))
 
 
