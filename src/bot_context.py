@@ -18,8 +18,8 @@ class BotContext:
 
     def __init__(self):
         self.bot_env = BotEnv()
-        self.get_rate = FcsApi(self.bot_env.fcs_access_key)
         self.triggers = self._parse_triggers()
+        self.get_rate = FcsApi(self.bot_env.fcs_access_key, [t.symbol for t in self.triggers])
         self.chtosrublem = ChtoSRublem(self.get_rate, NoOpMessenger())
 
     def _parse_triggers(self) -> list[MessageTrigger]:
