@@ -1,6 +1,6 @@
+import datetime
 import logging
-from datetime import date
-from typing import Optional, Tuple
+from typing import Optional
 
 import requests
 
@@ -8,6 +8,8 @@ from rates.get_rate import GetRate, Candle
 
 HISTORY_URL = 'https://fcsapi.com/api-v3/%s/history'
 LIST_URL = 'https://fcsapi.com/api-v3/forex/list'
+
+CACHE_TIME = datetime.timedelta(hours=1)
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +19,23 @@ class FcsApi(GetRate):
         self._access_key = access_key
         self._symbols = symbols
         self._symbol_ids = None
+        self._cache = {}
 
     def candles(self, source: str, symbol: str) -> list['Candle']:
+        key = (source, symbol)
+        if key in self._cache:
+            max_valid, candles = self._cache[key]
+            if datetime.datetime.now() < max_valid:
+                logger.debug(f"returning data from cache for {source=} {symbol=}")
+                return candles
+        candles = self._candles(source, symbol)
+        if len(candles) > 0:
+            max_valid = datetime.datetime.now() + CACHE_TIME
+            self._cache[key] = (max_valid, candles)
+        return candles
+
+    def _candles(self, source: str, symbol: str) -> list['Candle']:
+        logger.debug(f"fetch candles for {source=} {symbol=}")
         if not self._symbol_ids:
             self._symbol_ids = self.symbol_ids()
         if self._symbol_ids:
@@ -46,7 +63,7 @@ class FcsApi(GetRate):
                 return []
             candles = []
             for timestamp, candle in json['response'].items():
-                d = date.fromtimestamp(int(timestamp))
+                d = datetime.date.fromtimestamp(int(timestamp))
                 candles.append(Candle(float(candle['o']), float(candle['c']), d))
             return candles
         except Exception as e:
