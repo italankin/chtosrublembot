@@ -1,12 +1,12 @@
 import logging
 from datetime import date
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 
 from rates.get_rate import GetRate, Candle
 
-HISTORY_URL = 'https://fcsapi.com/api-v3/forex/history'
+HISTORY_URL = 'https://fcsapi.com/api-v3/%s/history'
 LIST_URL = 'https://fcsapi.com/api-v3/forex/list'
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class FcsApi(GetRate):
         self._symbols = symbols
         self._symbol_ids = None
 
-    def candles(self, symbol: str) -> list['Candle']:
+    def candles(self, source: str, symbol: str) -> list['Candle']:
         if not self._symbol_ids:
             self._symbol_ids = self.symbol_ids()
         if self._symbol_ids:
@@ -35,7 +35,8 @@ class FcsApi(GetRate):
                 params['id'] = symbol_id
             else:
                 params['symbol'] = symbol
-            response = requests.get(HISTORY_URL, params=params)
+            url = HISTORY_URL % source
+            response = requests.get(url, params=params)
             if response.status_code != 200:
                 logger.error(f"Received status_code={response.status_code}: {response.text}")
                 return []

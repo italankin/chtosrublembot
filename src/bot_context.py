@@ -34,7 +34,7 @@ class BotContext:
         substring = re.compile(node['substring']) if 'substring' in node else None
         captions = node.get('captions', [])
         fullmatch = re.compile(node['trigger'], flags=re.IGNORECASE)
-        return MessageTrigger(fullmatch, substring, node['symbol'], captions)
+        return MessageTrigger(fullmatch, substring, node.get('source', 'forex'), node['symbol'], captions)
 
     @staticmethod
     def _get_messenger_data(triggers: list[MessageTrigger]) -> dict[str, list[str]]:

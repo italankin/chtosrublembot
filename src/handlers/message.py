@@ -1,5 +1,5 @@
 import random
-from typing import Optional
+from typing import Optional, Tuple
 
 from telegram import Update, ChatAction
 from telegram.ext import Dispatcher, MessageHandler, Filters
@@ -17,11 +17,13 @@ def _command(bot_context: BotContext, update: Update, _):
     if not update.message:
         return
     text = update.message.text
-    symbol = _find_symbol(bot_context, text)
+    source, symbol = _find_symbol(bot_context, text)
     if not symbol:
         return
     update.message.reply_chat_action(ChatAction.TYPING)
-    status = bot_context.chtosrublem.status(symbol)
+    status = bot_context.chtosrublem.status(source, symbol)
+    if not status:
+        return
     if status.plot:
         update.effective_message.reply_photo(
             photo=status.plot,
@@ -35,11 +37,11 @@ def _command(bot_context: BotContext, update: Update, _):
         )
 
 
-def _find_symbol(bot_context: BotContext, text: str) -> Optional[str]:
+def _find_symbol(bot_context: BotContext, text: str) -> Optional[Tuple[str, str]]:
     for trigger in bot_context.triggers:
         if trigger.fullmatch.fullmatch(text):
-            return trigger.symbol
+            return trigger.source, trigger.symbol
         if trigger.substring and trigger.substring.search(text):
             if random.random() <= bot_context.bot_env.substring_trigger_rate:
-                return trigger.symbol
+                return trigger.source, trigger.symbol
     return None

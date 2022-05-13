@@ -20,15 +20,15 @@ class ChtoSRublem:
         self._get_rate = get_rate
         self._messenger = messenger
 
-    def status(self, symbol: str) -> 'Status':
-        candles = self._candles(symbol)
+    def status(self, source: str, symbol: str) -> Optional['Status']:
+        candles = self._candles(source, symbol)
         if len(candles) == 0:
-            raise ValueError('No data available')
+            raise None
         plot = self._make_plot(symbol, candles)
         return Status(text=self._messenger.caption(symbol), plot=plot)
 
-    def _candles(self, symbol: str) -> list[Candle]:
-        return self._get_rate.candles(symbol)
+    def _candles(self, source: str, symbol: str) -> list[Candle]:
+        return self._get_rate.candles(source, symbol)
 
     def _make_plot(self, symbol: str, candles: list[Candle]) -> Optional[io.BytesIO]:
         try:
@@ -47,7 +47,7 @@ class ChtoSRublem:
             else:
                 date_text = f"{date_start.strftime('%d %b')} - {date_end.strftime('%d %b')}"
 
-            fig = Figure(figsize=(4, 3))
+            fig = Figure(figsize=(5, 3))
             ax: Axes = fig.add_subplot(111)
             ax.set_title(f"{symbol} ({date_text})")
             ax.margins(0)
@@ -56,6 +56,7 @@ class ChtoSRublem:
             ax.xaxis.set_tick_params(which='both', length=0)
             ax.plot(values)
             ax.text(x=len(values) - 1, y=values[-1], s=str(values[-1]))
+            fig.tight_layout(pad=1.04)
 
             buf = io.BytesIO()
             fig.savefig(buf, dpi=120)
