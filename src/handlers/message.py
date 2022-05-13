@@ -17,9 +17,10 @@ def _command(bot_context: BotContext, update: Update, _):
     if not update.message:
         return
     text = update.message.text
-    source, symbol = _find_symbol(bot_context, text)
-    if not symbol:
+    result = _find_symbol(bot_context, text)
+    if not result:
         return
+    source, symbol = result
     update.message.reply_chat_action(ChatAction.TYPING)
     status = bot_context.chtosrublem.status(source, symbol)
     if not status:
